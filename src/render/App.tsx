@@ -17,7 +17,10 @@ import TempoController from './components/metronome/TempoController'
 import VolumeController from './components/metronome/VolumeController'
 
 import {
+  compass,
   isRunning,
+  practiceInputs,
+  practiceTime,
   tempo,
   tempoConditions,
   toggle,
@@ -86,6 +89,24 @@ export default defineComponent({
       stop()
     })
 
+    const timeLeft = computed(() => {
+      if (practiceTime.value === 0) return 0
+      let time = 0
+      for (
+        let i = tempo.value;
+        i <= practiceInputs.endTempo;
+        i += practiceInputs.increaseBy
+      ) {
+        time += (60 / i) * practiceInputs.interval * compass.value.length
+      }
+
+      const [minutes, seconds] = new Date(time * 1000)
+        .toISOString()
+        .substr(14, 5)
+        .split(':')
+      return `${minutes}m ${seconds}s`
+    })
+
     return () => (
       <div class='h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-indigo-50 to-indigo-100 pt-5'>
         <div class='max-w-xs w-full py-6 px-5 space-y-5 border rounded-2xl shadow bg-indigo-50'>
@@ -107,6 +128,13 @@ export default defineComponent({
               )
             )}
           </div>
+          {Boolean(timeLeft.value) && (
+            <div class='text-center text-xs bg-indigo-100 inline-block mx-auto w-full py-1'>
+              <span>
+                Time left: <strong>~{timeLeft.value}</strong>
+              </span>
+            </div>
+          )}
           <div
             class='bg-indigo-600 text-white text-center py-2 rounded-lg hover:bg-indigo-400 cursor-pointer font-light tracking-wide'
             id='practice-btn'

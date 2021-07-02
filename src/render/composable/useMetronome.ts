@@ -1,4 +1,18 @@
-import { onUnmounted, provide, readonly, ref, watch } from 'vue'
+import {
+  onUnmounted,
+  provide,
+  reactive,
+  readonly,
+  ref,
+  watch,
+  watchEffect,
+} from 'vue'
+
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext
+  }
+}
 
 export interface MetronomeOptions {
   tempo: number
@@ -13,6 +27,7 @@ const defaultOpt: MetronomeOptions = {
 let audioContext: AudioContext
 let intervalID: NodeJS.Timeout
 let practiceInterval: NodeJS.Timeout
+let practiceTimeInterval: NodeJS.Timeout
 
 let nextNoteTime = 0.0 // when the next note is due
 export const currentNote = ref(0)
@@ -24,10 +39,24 @@ export const tempoConditions = {
   max: 350,
 }
 
+export const practiceInputs = reactive({
+  startTempo: 60,
+  endTempo: 120,
+  increaseBy: 1,
+  interval: 4,
+})
+
 watch(tempo, (val, oldVal) => {
   if (val < tempoConditions.min || val > tempoConditions.max)
     tempo.value = oldVal
+
+  if (val >= practiceInputs.endTempo) {
+    clearInterval(practiceInterval)
+    practiceTime.value = 0
+  }
 })
+
+export const practiceTime = ref(0)
 
 export const volume = ref(100)
 
@@ -96,7 +125,7 @@ export function start() {
   if (isRunning.value) return
 
   if (audioContext == null) {
-    audioContext = new window.AudioContext()
+    audioContext = new (window.AudioContext || window.webkitAudioContext)()
   }
 
   isRunning.value = true
@@ -107,6 +136,7 @@ export function start() {
 
 export function stop() {
   isRunning.value = false
+  practiceTime.value = 0
   clearInterval(intervalID)
   clearInterval(practiceInterval)
 }
@@ -119,11 +149,6 @@ export function toggle() {
   }
 }
 
-// export function setTempo(val: number) {
-//   if (val >= 10 && val <= 500) tempo.value = val
-// }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setCompass = (beats: number) => {
   console.log(beats)
 

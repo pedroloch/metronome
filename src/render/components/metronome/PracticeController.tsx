@@ -1,7 +1,9 @@
-import { computed, defineComponent, reactive } from 'vue'
+import { computed, defineComponent, reactive, watch } from 'vue'
 import {
   compass,
   practice,
+  practiceInputs,
+  practiceTime,
   stop,
   tempoConditions,
 } from '../../composable/useMetronome'
@@ -14,13 +16,6 @@ export default defineComponent({
     onClose: { type: Function, required: true },
   },
   setup(props) {
-    const practiceInputs = reactive({
-      startTempo: 60,
-      endTempo: 120,
-      increaseBy: 1,
-      interval: 4,
-    })
-
     interface PracticeInput {
       label: string
       input: keyof typeof practiceInputs
@@ -74,6 +69,7 @@ export default defineComponent({
       ) {
         time += findBpm(i) * practiceInputs.interval * compass.value.length
       }
+
       const [minutes, seconds] = new Date(time * 1000)
         .toISOString()
         .substr(14, 5)
@@ -131,8 +127,20 @@ export default defineComponent({
             class='mt-4 bg-indigo-600 text-white w-full py-1 rounded hover:bg-indigo-500'
             onClick={() => {
               stop()
+
               practice(practiceInputs)
               props.onClose()
+
+              let time = 0
+              for (
+                let i = practiceInputs.startTempo;
+                i <= practiceInputs.endTempo;
+                i += practiceInputs.increaseBy
+              ) {
+                time +=
+                  findBpm(i) * practiceInputs.interval * compass.value.length
+              }
+              practiceTime.value = time
             }}
           >
             Start
