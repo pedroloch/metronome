@@ -1,9 +1,5 @@
 import { defineComponent } from 'vue'
-import {
-  checkConditions,
-  tempo,
-  tempoConditions,
-} from '../../composable/useMetronome'
+import { tempo, tempoConditions } from '../../composable/useMetronome'
 import Minus from '../icons/Minus'
 import Plus from '../icons/Plus'
 import RangeInput from '../RangeInput'
@@ -27,8 +23,7 @@ export default defineComponent({
             type='number'
             class='focus:outline-none focus-border-none  border-none text-center bg-transparent text-5xl font-medium text-gray-800 px-4 py-2 rounded-lg'
             {...tempoConditions}
-            v-model={[tempo.value, ['number']]}
-            onBlur={checkConditions}
+            v-model={[tempo.value, ['number', 'lazy']]}
           />
           <Plus class={iconsClasses} onClick={() => addValue()} />
         </div>

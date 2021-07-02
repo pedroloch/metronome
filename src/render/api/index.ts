@@ -1,7 +1,7 @@
-const Router = require('@cyyjs/electron-router');
+// const Router = require('@cyyjs/electron-router');
 
-Router.get('hello', () => {
-  return 'hello word!'
-})
+// Router.get('hello', () => {
+//   return 'hello word!'
+// })
 
-export const getHello = () => Router.get('hello')
+// export const getHello = () => Router.get('hello')

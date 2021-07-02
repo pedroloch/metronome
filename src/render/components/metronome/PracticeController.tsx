@@ -1,5 +1,10 @@
-import { defineComponent, reactive } from 'vue'
-import { practice, stop, tempoConditions } from '../../composable/useMetronome'
+import { computed, defineComponent, reactive } from 'vue'
+import {
+  compass,
+  practice,
+  stop,
+  tempoConditions,
+} from '../../composable/useMetronome'
 import Minus from '../icons/Minus'
 import Plus from '../icons/Plus'
 
@@ -58,10 +63,28 @@ export default defineComponent({
       if (+value > max) practiceInputs[input] = max
     }
 
+    const findBpm = (number: number) => 60 / number
+
+    const timeToFinish = computed(() => {
+      let time = 0
+      for (
+        let i = practiceInputs.startTempo;
+        i <= practiceInputs.endTempo;
+        i += practiceInputs.increaseBy
+      ) {
+        time += findBpm(i) * practiceInputs.interval * compass.value.length
+      }
+      const [minutes, seconds] = new Date(time * 1000)
+        .toISOString()
+        .substr(14, 5)
+        .split(':')
+      return `${minutes}m ${seconds}s`
+    })
+
     return () => (
       <div class='absolute bg-gray-500 bg-opacity-50 inset-0 flex justify-center items-center'>
         <div
-          class=' bg-white p-3 w-52 rounded shadow flex flex-col items-center justify-center text-gray-800 z-50'
+          class=' bg-white p-3 w-60 rounded shadow flex flex-col items-center justify-center text-gray-800 z-50'
           id='practice-modal'
         >
           <span class='text-2xl mb-1'>Practice</span>
@@ -100,6 +123,9 @@ export default defineComponent({
                 </div>
               </div>
             ))}
+          </div>
+          <div class='text-sm text-indigo-900 mt-5 px-2 py-1 rounded border border-indigo-200 bg-indigo-100 text-center'>
+            Practice time: <strong>{timeToFinish.value}</strong>
           </div>
           <button
             class='mt-4 bg-indigo-600 text-white w-full py-1 rounded hover:bg-indigo-500'

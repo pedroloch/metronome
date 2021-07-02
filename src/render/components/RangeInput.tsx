@@ -29,6 +29,8 @@ export default defineComponent({
       return value > 100 ? 100 : value
     })
 
+    let clickTime: number
+
     const progressDrag = ref(false)
 
     const rangeInput = ref<HTMLElement>()
@@ -39,9 +41,8 @@ export default defineComponent({
         const width = rangeInput.value.offsetWidth
         const position = e.pageX - offsetLeft
 
+        const value = props.min + (position / width) * (props.max - props.min)
         if (position >= 0 && position <= width) {
-          const value = props.min + (position / width) * (props.max - props.min)
-
           emit('update:modelValue', value > 10 ? Math.ceil(value) : 10)
         }
       }
@@ -57,14 +58,16 @@ export default defineComponent({
           <div
             class='h-2 bg-gray-200 rounded-full'
             onMousedown={() => (progressDrag.value = true)}
-            onClick={(e) => {
-              const value =
-                props.min +
-                (e.offsetX / rangeInput.value!.offsetWidth) *
-                  (props.max - props.min)
+            // onClick={(e) => {
+            //   const value =
+            //     props.min +
+            //     (e.offsetX / rangeInput.value!.offsetWidth) *
+            //       (props.max - props.min)
 
-              emit('update:modelValue', value > 10 ? Math.ceil(value) : 10)
-            }}
+            //   e.stopPropagation()
+
+            //   emit('update:modelValue', value > 10 ? Math.ceil(value) : 10)
+            // }}
             ref={rangeInput}
           >
             <div

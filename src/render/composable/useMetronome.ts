@@ -1,4 +1,4 @@
-import { onUnmounted, provide, readonly, ref } from 'vue'
+import { onUnmounted, provide, readonly, ref, watch } from 'vue'
 
 export interface MetronomeOptions {
   tempo: number
@@ -24,15 +24,12 @@ export const tempoConditions = {
   max: 350,
 }
 
-export const checkConditions = (e: FocusEvent) => {
-  const { min, max } = tempoConditions
-  const { value } = e.target as HTMLInputElement
+watch(tempo, (val, oldVal) => {
+  if (val < tempoConditions.min || val > tempoConditions.max)
+    tempo.value = oldVal
+})
 
-  if (+value < min) tempo.value = min
-  if (+value > max) tempo.value = max
-}
-
-export const volume = ref(50)
+export const volume = ref(100)
 
 const notesInQueue = [] // notes that have been put into the web audio and may or may not have been played yet {note, time}
 const lookahead = 25 // How frequently to call scheduling function (in milliseconds)
@@ -122,9 +119,9 @@ export function toggle() {
   }
 }
 
-export function setTempo(val: number) {
-  if (val >= 10 && val <= 500) tempo.value = val
-}
+// export function setTempo(val: number) {
+//   if (val >= 10 && val <= 500) tempo.value = val
+// }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setCompass = (beats: number) => {
@@ -148,7 +145,7 @@ export const practice = ({
   interval: number
   increaseBy: number
 }) => {
-  setTempo(startTempo)
+  tempo.value = startTempo
   start()
   tempo.value -= increaseBy
 

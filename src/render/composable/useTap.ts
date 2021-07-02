@@ -6,8 +6,8 @@ interface TapOptions {
 }
 
 const tapOptions = {
-  tries: 3,
-  debounce: 2000,
+  tries: 5,
+  debounce: 3000,
 }
 
 export default (id: string, options: Partial<TapOptions> = tapOptions) => {

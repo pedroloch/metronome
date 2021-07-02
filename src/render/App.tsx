@@ -16,7 +16,12 @@ import PracticeController from './components/metronome/PracticeController'
 import TempoController from './components/metronome/TempoController'
 import VolumeController from './components/metronome/VolumeController'
 
-import { isRunning, tempo, toggle, volume } from './composable/useMetronome'
+import {
+  isRunning,
+  tempo,
+  tempoConditions,
+  toggle,
+} from './composable/useMetronome'
 
 import useTap from './composable/useTap'
 
@@ -36,7 +41,7 @@ export default defineComponent({
     const { averageTempo, isTapping } = useTap('tap')
 
     watchEffect(() => {
-      if (averageTempo.value && averageTempo.value < 350)
+      if (averageTempo.value && averageTempo.value < tempoConditions.max)
         tempo.value = averageTempo.value
     })
 
@@ -82,8 +87,8 @@ export default defineComponent({
     })
 
     return () => (
-      <div class='h-screen flex flex-col items-center justify-center bg-indigo-50 pt-5'>
-        <div class='max-w-xs w-full py-6 px-5 space-y-5'>
+      <div class='h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-indigo-50 to-indigo-100 pt-5'>
+        <div class='max-w-xs w-full py-6 px-5 space-y-5 border rounded-2xl shadow bg-indigo-50'>
           <TempoController />
           <BeatsController />
           <div class='flex gap-2'>
