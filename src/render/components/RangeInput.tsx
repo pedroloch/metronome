@@ -35,7 +35,7 @@ export default defineComponent({
 
     const rangeInput = ref<HTMLElement>()
 
-    useEventListener(document, 'mousemove', (e) => {
+    const move = (e: MouseEvent) => {
       if (progressDrag.value && rangeInput.value) {
         const offsetLeft = rangeInput.value.getBoundingClientRect().left
         const width = rangeInput.value.offsetWidth
@@ -46,7 +46,10 @@ export default defineComponent({
           emit('update:modelValue', value > 10 ? Math.ceil(value) : 10)
         }
       }
-    })
+    }
+
+    useEventListener(document, 'mousemove', move)
+    useEventListener(document, 'pointermove', move)
 
     useEventListener(document, 'mouseup', () => {
       progressDrag.value = false
@@ -58,6 +61,7 @@ export default defineComponent({
           <div
             class='h-2 bg-gray-200 rounded-full'
             onMousedown={() => (progressDrag.value = true)}
+            onPointerdown={() => (progressDrag.value = true)}
             // onClick={(e) => {
             //   const value =
             //     props.min +
